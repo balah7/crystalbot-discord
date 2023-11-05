@@ -6,7 +6,7 @@ Crystalbot is a simple Discord bot written in Crystal, using the Discordcr shard
 
 Before you start using Crystalbot, you'll need to set up a few environment variables. Create a `.env` file in the root directory of your project and add the following variables:
 
-- `BOT_TOKEN`: Your Discord bot token.
+- `BOT_TOKEN`: Your [Discord bot](https://discord.com/developers/applications) token.
 - `CLIENT_ID`: Your Discord bot's client ID.
 - `PREFIX`: The bot's command prefix.
 

@@ -14,7 +14,7 @@ module Crystalbot
   cache = Discord::Cache.new(client)
   client.cache = cache
 
-  bot = cache.resolve_user(client.client_id.to_u64)
+  bot = cache.resolve_user(client_id.to_u64)
 
   client.on_ready do
     puts "#{bot.username} is online!"
@@ -24,7 +24,6 @@ module Crystalbot
     next if message.author.bot
     next if !message.content.starts_with?(prefix)
     cmd = message.content.gsub(prefix, "")
-    puts cmd
 
     # Commands (I tried to use case/when, but it was causing some issues)
 
@@ -44,6 +43,7 @@ module Crystalbot
 
       begin
         user = cache.resolve_user(user_id.to_u64)
+        puts user
 
         base_url = "https://cdn.discordapp.com/avatars/#{user.id}/#{user.avatar}"
         response = HTTP::Client.get(base_url)
@@ -52,12 +52,12 @@ module Crystalbot
           content_type = response.headers["content-type"]
           avatar_url = content_type == "image/png" ? "https://cdn.discordapp.com/avatars/#{user.id}/#{user.avatar}.png?size=2048" : "https://cdn.discordapp.com/avatars/#{user.id}/#{user.avatar}.gif?size=2048"
 
-          base_url2 = "https://cdn.discordapp.com/avatars/#{message.author.id}/#{message.author.avatar}"
-          response2 = HTTP::Client.get(base_url2)
-          avatar_url2 = ""
-          if response2.status_code == 200
-            content_type2 = response2.headers["content-type"]
-            avatar_url2 = content_type2 == "image/png" ? "https://cdn.discordapp.com/avatars/#{message.author.id}/#{message.author.avatar}.png?size=2048" : "https://cdn.discordapp.com/avatars/#{message.author.id}/#{message.author.avatar}.gif?size=2048"
+          base_url_author = "https://cdn.discordapp.com/avatars/#{message.author.id}/#{message.author.avatar}"
+          response_author = HTTP::Client.get(base_url_author)
+          avatar_url_author = ""
+          if response_author.status_code == 200
+            content_type_author = response_author.headers["content-type"]
+            avatar_url_author = content_type_author == "image/png" ? "https://cdn.discordapp.com/avatars/#{message.author.id}/#{message.author.avatar}.png?size=2048" : "https://cdn.discordapp.com/avatars/#{message.author.id}/#{message.author.avatar}.gif?size=2048"
           end
 
           embed = Discord::Embed.new
@@ -65,7 +65,7 @@ module Crystalbot
           embed.description = "[View it here](#{avatar_url})"
           embed.colour = 0xFF0000 # Hexadecimal color
           embed.image = Discord::EmbedImage.new(url: avatar_url)
-          embed.footer = Discord::EmbedFooter.new(text: "Executed by: #{message.author.username}", icon_url: avatar_url2)
+          embed.footer = Discord::EmbedFooter.new(text: "Executed by: #{message.author.username}", icon_url: avatar_url_author)
         end
         client.create_message(channel_id: message.channel_id, content: "", embed: embed)
       rescue ex : Exception

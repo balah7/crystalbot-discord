@@ -47,17 +47,15 @@ module Crystalbot
 
         base_url = "https://cdn.discordapp.com/avatars/#{user.id}/#{user.avatar}"
         response = HTTP::Client.get(base_url)
-        avatar_url = ""
         if response.status_code == 200
           content_type = response.headers["content-type"]
-          avatar_url = content_type == "image/png" ? "https://cdn.discordapp.com/avatars/#{user.id}/#{user.avatar}.png?size=2048" : "https://cdn.discordapp.com/avatars/#{user.id}/#{user.avatar}.gif?size=2048"
+          avatar_url = content_type == "image/png" ? "https://cdn.discordapp.com/avatars/#{user.id}/#{user.avatar}.png?size=4096" : "https://cdn.discordapp.com/avatars/#{user.id}/#{user.avatar}.gif?size=4096"
 
           base_url_author = "https://cdn.discordapp.com/avatars/#{message.author.id}/#{message.author.avatar}"
           response_author = HTTP::Client.get(base_url_author)
-          avatar_url_author = ""
           if response_author.status_code == 200
             content_type_author = response_author.headers["content-type"]
-            avatar_url_author = content_type_author == "image/png" ? "https://cdn.discordapp.com/avatars/#{message.author.id}/#{message.author.avatar}.png?size=2048" : "https://cdn.discordapp.com/avatars/#{message.author.id}/#{message.author.avatar}.gif?size=2048"
+            avatar_url_author = content_type_author == "image/png" ? "https://cdn.discordapp.com/avatars/#{message.author.id}/#{message.author.avatar}.png?size=4096" : "https://cdn.discordapp.com/avatars/#{message.author.id}/#{message.author.avatar}.gif?size=4096"
           end
 
           embed = Discord::Embed.new

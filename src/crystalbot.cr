@@ -1,6 +1,5 @@
 require "discordcr"
 require "dotenv"
-require "http/client"
 
 Dotenv.load
 
@@ -43,34 +42,39 @@ module Crystalbot
 
       begin
         user = cache.resolve_user(user_id.to_u64)
-        puts user
 
-        base_url = "https://cdn.discordapp.com/avatars/#{user.id}/#{user.avatar}"
-        response = HTTP::Client.get(base_url)
-        if response.status_code == 200
-          content_type = response.headers["content-type"]
-          avatar_url = content_type == "image/png" ? "https://cdn.discordapp.com/avatars/#{user.id}/#{user.avatar}.png?size=4096" : "https://cdn.discordapp.com/avatars/#{user.id}/#{user.avatar}.gif?size=4096"
-
-          base_url_author = "https://cdn.discordapp.com/avatars/#{message.author.id}/#{message.author.avatar}"
-          response_author = HTTP::Client.get(base_url_author)
-          if response_author.status_code == 200
-            content_type_author = response_author.headers["content-type"]
-            avatar_url_author = content_type_author == "image/png" ? "https://cdn.discordapp.com/avatars/#{message.author.id}/#{message.author.avatar}.png?size=4096" : "https://cdn.discordapp.com/avatars/#{message.author.id}/#{message.author.avatar}.gif?size=4096"
-          end
-
-          embed = Discord::Embed.new
-          embed.title = "#{user.username}'s Avatar"
-          embed.description = "[View it here](#{avatar_url})"
-          embed.colour = 0xFF0000 # Hexadecimal color
-          embed.image = Discord::EmbedImage.new(url: avatar_url)
-          embed.footer = Discord::EmbedFooter.new(text: "Executed by: #{message.author.username}", icon_url: avatar_url_author)
-        end
+        embed = Discord::Embed.new
+        embed.title = "#{user.username}'s Avatar"
+        embed.description = "[View it here](#{avatar_url(user)})"
+        embed.colour = random_hexcolor # Hexadecimal color
+        embed.image = Discord::EmbedImage.new(url: avatar_url(user))
+        embed.footer = Discord::EmbedFooter.new(text: "Executed by: #{message.author.username}", icon_url: avatar_url(message.author))
         client.create_message(channel_id: message.channel_id, content: "", embed: embed)
       rescue ex : Exception
         client.create_message(message.channel_id, "<@#{message.author.id}> **|** ❌ Please mention a user or provide a valid member ID.")
+        puts ex.message
       end
     end
   end
 
   client.run
+end
+
+def avatar_url(user : Discord::User) : String
+  url = "https://cdn.discordapp.com/avatars/#{user.id}/#{user.avatar}"
+  if user.avatar
+    extension = user.avatar.not_nil!.starts_with?("a_") ? ".gif?size=4096" : ".png?size=4096"
+    url + extension
+  else
+    index = user.discriminator == "0" ? (user.id.to_u64 >> 22) % 6 : user.discriminator.to_i % 5
+    "https://cdn.discordapp.com/embed/avatars/#{index}.png?size=4096"
+  end
+end
+
+def random_hexcolor : UInt32
+  r = rand(255).to_s(16).rjust(2, '0')
+  g = rand(255).to_s(16).rjust(2, '0')
+  b = rand(255).to_s(16).rjust(2, '0')
+
+  "0x#{r}#{g}#{b}"[2..-1].to_i(16).to_u32
 end

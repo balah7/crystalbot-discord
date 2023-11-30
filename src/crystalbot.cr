@@ -1,5 +1,6 @@
 require "discordcr"
 require "dotenv"
+require "http/client"
 
 Dotenv.load
 
@@ -62,7 +63,8 @@ end
 
 def avatar_url(user : Discord::User) : String
   url = "https://cdn.discordapp.com/avatars/#{user.id}/#{user.avatar}"
-  if user.avatar
+  response = HTTP::Client.get(url)
+  if user.avatar && response.status_code == 200
     extension = user.avatar.not_nil!.starts_with?("a_") ? ".gif?size=4096" : ".png?size=4096"
     url + extension
   else

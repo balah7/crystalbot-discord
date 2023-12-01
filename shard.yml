@@ -5,7 +5,7 @@ authors:
   - your-name-here <your-email-here>
 
 targets:
-  Crystalbot:
+  crystalbot:
     main: src/crystalbot.cr
 
 dependencies:

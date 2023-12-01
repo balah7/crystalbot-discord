@@ -1,6 +1,5 @@
 require "discordcr"
 require "dotenv"
-require "http/client"
 
 Dotenv.load
 
